@@ -10,6 +10,7 @@ const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
+const app = express();
 
 app.use(cookieSession({
   name: 'session',
