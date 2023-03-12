@@ -148,7 +148,7 @@ const getAllProperties = function(options, limit = 10) {
   //3
   if (options.city) {
     queryParams.push(`${options.city}`);
-    queryString += `AND city LIKE $1 `;
+    queryString += `AND city LIKE %$1% `;
   }
   if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
@@ -164,15 +164,14 @@ const getAllProperties = function(options, limit = 10) {
   }
 
 
-  // // 4
+  // 4
 
   queryString += `
   GROUP BY properties.id
-
   `;
   if (options.minimum_rating) {
     queryParams.push(`${options.minimum_rating}`);
-    queryString += `HAVING avg(property_reviews.rating) >= $${queryParams.length} `;
+    queryString += `HAVING avg(property_reviews.rating) >= ${queryParams.length} `;
   }
 
   queryParams.push(limit);
@@ -180,10 +179,10 @@ const getAllProperties = function(options, limit = 10) {
   queryString += `LIMIT $${queryParams.length};`;
 
 
-  // // 5
+  // 5
   console.log(queryString, queryParams);
 
-  // // 6
+  // 6
   return pool.query(queryString, queryParams).then((res) => res.rows);
 };
 exports.getAllProperties = getAllProperties;
@@ -196,7 +195,7 @@ exports.getAllProperties = getAllProperties;
  */
 const addProperty = function(property) {
   return pool
-    .query(`INSERT INTO properties (title, description, owner_id, cover_photo_url, thumbnail_photo_url, cost_per_night, parking_spaces, number_of_bathrooms, number_of_bedrooms, province, city, country, street, post_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14);`, [property.title, property.description, property.owner_id, property.cover_photo_url, property.thumbnail_photo_url, property.cost_per_night, property.parking_spaces, property.number_of_bathrooms, property.number_of_bedrooms, property.province, property.city, property.country, property.street, property.post_code])
+    .query(`INSERT INTO properties (title, description, owner_id, cover_photo_url, thumbnail_photo_url, cost_per_night, parking_spaces, number_of_bathrooms, number_of_bedrooms, province, city, country, street, post_code) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *;`, [property.title, property.description, property.owner_id, property.cover_photo_url, property.thumbnail_photo_url, property.cost_per_night, property.parking_spaces, property.number_of_bathrooms, property.number_of_bedrooms, property.province, property.city, property.country, property.street, property.post_code])
     .then((res) => res.rows[0])
     .catch((err) => {
       console.log(err.message);
